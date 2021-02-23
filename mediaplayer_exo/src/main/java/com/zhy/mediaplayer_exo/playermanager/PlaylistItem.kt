@@ -1,4 +1,4 @@
-package com.zhy.mediaplayerserver.playermanager
+package com.zhy.mediaplayer_exo.playermanager
 
 import android.os.Handler
 import com.google.android.exoplayer2.MediaItem

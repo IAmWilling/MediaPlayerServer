@@ -1,6 +1,6 @@
 package com.zhy.mediaplayerserver.test
 
-import com.zhy.mediaplayerserver.playermanager.PlaylistItem
+import com.zhy.mediaplayer_exo.playermanager.PlaylistItem
 
 class MusicItem(val item: PlayItem) : PlaylistItem {
 

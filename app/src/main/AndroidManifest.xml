@@ -2,17 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.zhy.mediaplayerserver">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config_1"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".App"
-        android:networkSecurityConfig="@xml/network_security_config_1"
         android:theme="@style/AppTheme">
+        <activity android:name=".DetailActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,9 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".playermanager.service.MediaForegroundService">
+
+        <service
+            android:name="com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService"
+            android:exported="false"
+            android:stopWithTask="true">
             <intent-filter android:priority="1000">
-                <action android:name="${applicationId}.mediaplayer.service.action"></action>
+                <action android:name="${applicationId}.mediaplayer.service.action" />
             </intent-filter>
         </service>
     </application>

@@ -1,2 +1,3 @@
+include ':mediaplayer_exo'
 include ':app'
 rootProject.name = "MediaPlayerServer"

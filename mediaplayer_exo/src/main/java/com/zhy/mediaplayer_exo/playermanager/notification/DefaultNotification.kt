@@ -1,4 +1,4 @@
-package com.zhy.mediaplayerserver.playermanager.notification
+package com.zhy.mediaplayer_exo.playermanager.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -8,12 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Bundle
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.zhy.mediaplayerserver.R
-import com.zhy.mediaplayerserver.playermanager.musicbroadcast.MusicBroadcast
-import kotlin.math.abs
+import com.zhy.mediaplayer_exo.R
+import com.zhy.mediaplayer_exo.playermanager.manager.MediaManager
+import com.zhy.mediaplayer_exo.playermanager.musicbroadcast.MusicBroadcast
 
 /**
  * 通知栏服务
@@ -44,6 +45,9 @@ open class DefaultNotification {
 
         @JvmStatic
         private var closePrimaryId = 4
+
+        @JvmStatic
+        private var contentPrimaryId = 5
 
     }
 
@@ -79,6 +83,35 @@ open class DefaultNotification {
             field = value
         }
 
+    //播放image
+    var playImage: Int = -1
+        set(value) {
+            field = value
+        }
+
+    //暂停image
+    var pauseImage: Int = -1
+        set(value) {
+            field = value
+        }
+
+    //上一个image
+    var nextImage: Int = -1
+        set(value) {
+            field = value
+        }
+
+    //下一个image
+    var lastImage: Int = -1
+        set(value) {
+            field = value
+        }
+
+    //设置传入参数参数
+    var contentPrams: () -> Bundle = { Bundle() }
+    var startIntentArray = arrayOf<Class<*>>()
+    var extraBundleName = ""
+
     /**
      * 启动通知栏
      */
@@ -97,7 +130,7 @@ open class DefaultNotification {
     @RequiresApi(Build.VERSION_CODES.O)
     protected fun createChannel(channelId: String, channelName: String) {
         val channel =
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_MIN)
         channel.setSound(null, null)
         val notificationManager =
             mContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -113,6 +146,40 @@ open class DefaultNotification {
         lastPrimaryId++
         nextPrimaryId++
         closePrimaryId++
+        contentPrimaryId++
+        val contentClickPendingIntent =
+            if (startIntentArray.isEmpty()) null else {
+                val intentArray = mutableListOf<Intent>()
+                println("contentClickPendingIntent ${startIntentArray.size}")
+                startIntentArray.forEachIndexed { index, clazz ->
+                    if (index != startIntentArray.size - 1) {
+                        intentArray.add(
+                            Intent(
+                                mContext,
+                                clazz
+                            ).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        )
+
+                    } else {
+                        println("contentClickPendingIntent ${clazz.name}")
+                        intentArray.add(
+                            Intent(mContext, clazz).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .putExtra(
+                                    extraBundleName,
+                                    if (MediaManager.isInit) contentPrams() else Bundle()
+                                )
+                        )
+                    }
+
+                }
+                PendingIntent.getActivities(
+                    mContext,
+                    contentPrimaryId,
+                    intentArray.toTypedArray(),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            }
+
         // 播放/暂停按钮点击
         val playerClickPendingIntent = PendingIntent.getBroadcast(
             mContext,
@@ -156,25 +223,35 @@ open class DefaultNotification {
         remoteViews.setOnClickPendingIntent(R.id.default_notific_close, closeClickPendingIntent)
         remoteViews.setImageViewResource(
             R.id.default_play,
-            if (playState) R.mipmap.pause_notification else R.mipmap.play_notification
+            if (playState) if (pauseImage == -1) R.mipmap.pause_notification else pauseImage else if (playImage == -1) R.mipmap.play_notification else playImage
+        )
+        remoteViews.setImageViewResource(
+            R.id.default_next,
+            if (nextImage == -1) R.mipmap.next_and_last_notification else nextImage
+        )
+
+        remoteViews.setImageViewResource(
+            R.id.default_last,
+            if (lastImage == -1) R.mipmap.next_and_last_notification else lastImage
         )
         remoteViews.setImageViewBitmap(R.id.default_song_cover_img, notificCover)
         remoteViews.setTextViewText(R.id.default_song_intro, notificIntro)
         remoteViews.setTextViewText(R.id.default_song_name, notificTitle)
         val notification = NotificationCompat.Builder(mContext, channelId)
             .setWhen(System.currentTimeMillis())
-            .setPriority(NotificationManager.IMPORTANCE_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setLargeIcon(largeIcon)
             .setSmallIcon(smallIcon)
             .setContent(remoteViews)
+            .setContentIntent(contentClickPendingIntent)
             .setOnlyAlertOnce(true)
             .setVibrate(null)
             .setSound(null)
             .setLights(0, 0, 0)
             .build()
-        notification.flags =
-            Notification.FLAG_NO_CLEAR
+        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR
+
         return notification
     }
 
@@ -182,6 +259,7 @@ open class DefaultNotification {
      * 更新播放状态
      */
     fun update(playState: Boolean, title: String, intro: String) {
+        println("update------ 更新播放状态 ${title}")
         val notificationManager =
             mContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(
@@ -197,6 +275,7 @@ open class DefaultNotification {
      * 更新播放状态
      */
     fun update(playState: Boolean, title: String, intro: String, cover: Bitmap) {
+        println("update------ 更新bitmap ${title}")
         val notificationManager =
             mContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(
@@ -245,6 +324,37 @@ open class DefaultNotification {
 
         fun setMediaCover(bitmap: Bitmap): Builder {
             defaultNotification.notificCover = bitmap
+            return this
+        }
+
+        fun setPlayImage(resid: Int): Builder {
+            defaultNotification.playImage = resid
+            return this
+        }
+
+        fun setPauseImage(resid: Int): Builder {
+            defaultNotification.pauseImage = resid
+            return this
+        }
+
+        fun setLastImage(resid: Int): Builder {
+            defaultNotification.lastImage = resid
+            return this
+        }
+
+        fun setNextImage(resid: Int): Builder {
+            defaultNotification.nextImage = resid
+            return this
+        }
+
+        fun setStartActivityClassArray(array: Array<Class<*>>): Builder {
+            defaultNotification.startIntentArray = array
+            return this
+        }
+
+        fun setStartActivityBundle(extraName: String, block: () -> Bundle): Builder {
+            defaultNotification.extraBundleName = extraName
+            defaultNotification.contentPrams = block
             return this
         }
 
