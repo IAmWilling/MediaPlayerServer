@@ -140,12 +140,12 @@ MediaManager.getSimpleExoPlayer()
     /**
      * 获取播放实例
      */
-    fun getSimpleExoPlayer(): SimpleExoPlayer = simpleExoPlayer
+    fun getSimpleExoPlayer(): SimpleExoPlayer 
 
     /**
      * 获取播放总进度
      */
-    fun getCurrentDuration() = simpleExoPlayer.duration
+    fun getCurrentDuration()
 
     /**
      * 获取当前音频标题
