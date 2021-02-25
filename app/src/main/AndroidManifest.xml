@@ -24,14 +24,7 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService"
-            android:exported="false"
-            android:stopWithTask="true">
-            <intent-filter android:priority="1000">
-                <action android:name="${applicationId}.mediaplayer.service.action" />
-            </intent-filter>
-        </service>
+
     </application>
 
 </manifest>

@@ -11,8 +11,6 @@ import com.bumptech.glide.signature.ObjectKey
 import com.google.android.exoplayer2.Player
 import com.zhy.mediaplayer_exo.playermanager.*
 import com.zhy.mediaplayer_exo.playermanager.manager.MediaManager
-import com.zhy.mediaplayer_exo.playermanager.notification.DefaultNotification
-import com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService
 import com.zhy.mediaplayerserver.test.MusicItem
 import com.zhy.mediaplayerserver.test.PlayItem
 import com.zhy.mediaplayerserver.util.stringForTime2
@@ -90,9 +88,21 @@ class MainActivity : AppCompatActivity(), MediaProgressListener, MediaPlayStateL
 
     override fun onStart() {
         super.onStart()
-
-
+        println("activity_li onStart")
     }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+    }
+
 
     override fun onProgressChange(position: Long, duration: Long) {
         current_time.text = stringForTime2(position)
@@ -138,4 +148,14 @@ class MainActivity : AppCompatActivity(), MediaProgressListener, MediaPlayStateL
     override fun onDestroy() {
         super.onDestroy()
     }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if(!hasFocus) {
+            println("通知栏下拉 通知栏下拉")
+        }
+    }
+
+
+
 }

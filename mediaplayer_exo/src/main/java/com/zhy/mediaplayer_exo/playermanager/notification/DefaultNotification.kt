@@ -13,11 +13,17 @@ import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.zhy.mediaplayer_exo.R
+import com.zhy.mediaplayer_exo.playermanager.MediaPlayerService
 import com.zhy.mediaplayer_exo.playermanager.manager.MediaManager
 import com.zhy.mediaplayer_exo.playermanager.musicbroadcast.MusicBroadcast
 
 /**
- * 通知栏服务
+ * Created by zhy
+ * Date 2021/2/25
+ *
+ * 默认通知栏
+ * 默认渠道ID：playerMedia 渠道名称：音频服务
+ * 播放服务控制视图
  */
 open class DefaultNotification {
     companion object {
@@ -58,26 +64,38 @@ open class DefaultNotification {
         set(value) {
             field = value
         }
+
+    //通知栏显示的小图标
     var smallIcon = R.mipmap.ic_launcher
         set(value) {
             field = value
         }
+
+    //通知栏显示的大图标
     var largeIcon: Bitmap? = null
         set(value) {
             field = value
         }
+
+    //播放状态
     var playState: Boolean = false
         set(value) {
             field = value
         }
+
+    //通知栏自定义标题
     var notificTitle: String? = null
         set(value) {
             field = value
         }
+
+    //通知栏自定义简介
     var notificIntro: String? = null
         set(value) {
             field = value
         }
+
+    //通知栏自定义封面
     var notificCover: Bitmap? = null
         set(value) {
             field = value
@@ -107,9 +125,19 @@ open class DefaultNotification {
             field = value
         }
 
+    //适配小通知栏
+    var smallContentRemoteViews: Int = R.layout.default_small_media_exopalyer_notification
+        set(value) {
+            field = value
+        }
+
     //设置传入参数参数
     var contentPrams: () -> Bundle = { Bundle() }
+
+    //需要启动的activity
     var startIntentArray = arrayOf<Class<*>>()
+
+    //传入的bundle key
     var extraBundleName = ""
 
     /**
@@ -127,6 +155,9 @@ open class DefaultNotification {
         }
     }
 
+    /**
+     * 创建渠道
+     */
     @RequiresApi(Build.VERSION_CODES.O)
     protected fun createChannel(channelId: String, channelName: String) {
         val channel =
@@ -142,6 +173,7 @@ open class DefaultNotification {
      */
     protected fun createNotification(channelId: String = "playerMedia"): Notification {
         val remoteViews = RemoteViews(mContext.packageName, notificationLayout)
+        val smallRemoteViews = RemoteViews(mContext.packageName, smallContentRemoteViews)
         playPrimaryId++
         lastPrimaryId++
         nextPrimaryId++
@@ -227,16 +259,40 @@ open class DefaultNotification {
         )
         remoteViews.setImageViewResource(
             R.id.default_next,
-            if (nextImage == -1) R.mipmap.next_and_last_notification else nextImage
+            if (nextImage == -1) R.mipmap.next_notification_icon else nextImage
         )
 
         remoteViews.setImageViewResource(
             R.id.default_last,
-            if (lastImage == -1) R.mipmap.next_and_last_notification else lastImage
+            if (lastImage == -1) R.mipmap.last_notification_icon else lastImage
         )
         remoteViews.setImageViewBitmap(R.id.default_song_cover_img, notificCover)
         remoteViews.setTextViewText(R.id.default_song_intro, notificIntro)
         remoteViews.setTextViewText(R.id.default_song_name, notificTitle)
+
+        smallRemoteViews.apply {
+            setOnClickPendingIntent(R.id.default_play, playerClickPendingIntent)
+            setOnClickPendingIntent(R.id.default_last, lastClickPendingIntengt)
+            setOnClickPendingIntent(R.id.default_next, nextClickPendingIntengt)
+            setOnClickPendingIntent(R.id.default_notific_close, closeClickPendingIntent)
+            setImageViewResource(
+                R.id.default_play,
+                if (playState) if (pauseImage == -1) R.mipmap.pause_notification else pauseImage else if (playImage == -1) R.mipmap.play_notification else playImage
+            )
+            setImageViewResource(
+                R.id.default_next,
+                if (nextImage == -1) R.mipmap.next_notification_icon else nextImage
+            )
+
+            setImageViewResource(
+                R.id.default_last,
+                if (lastImage == -1) R.mipmap.last_notification_icon else lastImage
+            )
+            setImageViewBitmap(R.id.default_song_cover_img, notificCover)
+            setTextViewText(R.id.default_song_intro, notificIntro)
+            setTextViewText(R.id.default_song_name, notificTitle)
+        }
+
         val notification = NotificationCompat.Builder(mContext, channelId)
             .setWhen(System.currentTimeMillis())
             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -244,13 +300,15 @@ open class DefaultNotification {
             .setLargeIcon(largeIcon)
             .setSmallIcon(smallIcon)
             .setContent(remoteViews)
+            .setCustomBigContentView(remoteViews)
+            .setCustomContentView(smallRemoteViews)
             .setContentIntent(contentClickPendingIntent)
             .setOnlyAlertOnce(true)
             .setVibrate(null)
             .setSound(null)
             .setLights(0, 0, 0)
             .build()
-        notification.flags = notification.flags or Notification.FLAG_NO_CLEAR
+        notification.flags = Notification.FLAG_FOREGROUND_SERVICE
 
         return notification
     }
@@ -263,7 +321,7 @@ open class DefaultNotification {
         val notificationManager =
             mContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(
-            10086, DefaultNotification.Builder(mContext)
+            MediaPlayerService.notificationId, DefaultNotification.Builder(mContext)
                 .setPlayState(playState)
                 .setTitleText(title)
                 .setIntroText(intro)
@@ -279,7 +337,7 @@ open class DefaultNotification {
         val notificationManager =
             mContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(
-            10086, DefaultNotification.Builder(mContext)
+            MediaPlayerService.notificationId, DefaultNotification.Builder(mContext)
                 .setPlayState(playState)
                 .setTitleText(title)
                 .setIntroText(intro)
@@ -288,80 +346,139 @@ open class DefaultNotification {
         )
     }
 
-
+    /**
+     * 服务构建
+     */
     class Builder(val context: Context) {
         var defaultNotification: DefaultNotification = DefaultNotification.getInstance()
 
+        /**
+         * 设置通知栏应用图标
+         */
         fun setSmallIcon(resid: Int): Builder {
             defaultNotification.smallIcon = resid
             return this
         }
 
+        /**
+         * 设置通知栏自定义布局
+         * 不设置 则 默认是sdk自带布局
+         */
         fun setRemoteViews(layoutId: Int): Builder {
             defaultNotification.notificationLayout = layoutId
             return this
         }
 
+        /**
+         * 设置图标
+         */
         fun setLargeIcon(icon: Bitmap?): Builder {
             defaultNotification.largeIcon = icon
             return this
         }
 
+        /**
+         * 设置播放状态
+         * 非必要初始化不需要设置
+         */
         fun setPlayState(state: Boolean): Builder {
             defaultNotification.playState = state
             return this
         }
 
+        /**
+         * 设置通知栏音频标题
+         * 初始化可设置初始标题
+         */
         fun setTitleText(title: String): Builder {
             defaultNotification.notificTitle = title
             return this
         }
 
+        /**
+         * 设置通知栏布局详情
+         * 初始化可设置初始详情
+         */
         fun setIntroText(intro: String): Builder {
             defaultNotification.notificIntro = intro
             return this
         }
 
+        /**
+         * 设置封面
+         */
         fun setMediaCover(bitmap: Bitmap): Builder {
             defaultNotification.notificCover = bitmap
             return this
         }
 
+        /**
+         * 设置播放状态时的图片
+         */
         fun setPlayImage(resid: Int): Builder {
             defaultNotification.playImage = resid
             return this
         }
 
+        /**
+         * 设置暂停状态时的图片
+         */
         fun setPauseImage(resid: Int): Builder {
             defaultNotification.pauseImage = resid
             return this
         }
 
+        /**
+         * 设置上一曲图片
+         */
         fun setLastImage(resid: Int): Builder {
             defaultNotification.lastImage = resid
             return this
         }
-
+        /**
+         * 设置下一曲图片
+         */
         fun setNextImage(resid: Int): Builder {
             defaultNotification.nextImage = resid
             return this
         }
 
+        /**
+         * 设置通知栏适配小型布局
+         * 有些手机需要设置比如小米，总是初始为小布局
+         * 锁屏界面需要的话 可以设置
+         */
+        fun setSmallRemoteViews(layoutId: Int): Builder {
+            defaultNotification.smallContentRemoteViews = layoutId
+            return this
+        }
+
+        /**
+         * 设置通知栏整体点击之后需要跳转的activity组
+         * 一般最后一个activity是你需要最终跳转到activity
+         * 第一个一般都是MainActivity 看需求
+         */
         fun setStartActivityClassArray(array: Array<Class<*>>): Builder {
             defaultNotification.startIntentArray = array
             return this
         }
 
+        /**
+         * 跳转之后需要携带的一些数据可以自己设置
+         * 但这些数据最好是全局都可以拿到的，比如在MediaManager可以拿到的任何数据等
+         */
         fun setStartActivityBundle(extraName: String, block: () -> Bundle): Builder {
             defaultNotification.extraBundleName = extraName
             defaultNotification.contentPrams = block
             return this
         }
 
+        /**
+         * 打包
+         */
         fun build(): Notification {
             return defaultNotification.startNotification(context)
         }
-
 
     }
 

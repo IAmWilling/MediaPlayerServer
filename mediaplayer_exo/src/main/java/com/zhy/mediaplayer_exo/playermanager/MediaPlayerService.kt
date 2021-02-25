@@ -12,15 +12,18 @@ import com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService
 
 /**
  * 音频播放服务
- *
+ *  启动服务
  */
 object MediaPlayerService : Application.ActivityLifecycleCallbacks {
-    private lateinit var mNotification: Notification
+    lateinit var mNotification: Notification
     private lateinit var mContext: Context
     private var activityCreated = 0
-    fun init(context: Application, notification: Notification) {
+
+    var notificationId = 0
+    fun init(context: Application, id: Int, notification: Notification) {
         this.mNotification = notification
         this.mContext = context
+        this.notificationId = id
         context.registerActivityLifecycleCallbacks(this)
     }
 
@@ -28,8 +31,6 @@ object MediaPlayerService : Application.ActivityLifecycleCallbacks {
      * 停止播放服务
      */
     fun stop(context: Context) {
-        MediaManager.getSimpleExoPlayer().stop()
-        MediaManager.getSimpleExoPlayer().release()
         context.stopService(Intent(context, MediaForegroundService::class.java))
     }
 
@@ -60,7 +61,7 @@ object MediaPlayerService : Application.ActivityLifecycleCallbacks {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 mContext.startForegroundService(serviceIntent)
-            }else {
+            } else {
                 mContext.startService(serviceIntent)
             }
         }
@@ -68,8 +69,6 @@ object MediaPlayerService : Application.ActivityLifecycleCallbacks {
 
     override fun onActivityResumed(activity: Activity) {
     }
-
-
 
 
 }

@@ -1,5 +1,6 @@
 package com.zhy.mediaplayerserver
 
+import android.app.Activity
 import android.app.Application
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -12,24 +13,13 @@ import com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-
-//        val className = MediaForegroundService.javaClass.name
-//        if(MediaForegroundService.isServiceWork(this,className.substring(0,className.lastIndexOf("$")))) {
-//            println("正在运行")
-//        }else {
-//            println("没有运行")
-//
-//        }
         MediaPlayerService.init(
             this,
+            10,
             DefaultNotification.Builder(this)
                 .setIntroText("详情信息")
                 .setTitleText("FM收音机广播")
                 .setSmallIcon(R.mipmap.icon)
-                .setPlayImage(R.mipmap.play)
-                .setPauseImage(R.mipmap.pause)
-                .setNextImage(R.mipmap.exe_next)
-                .setLastImage(R.mipmap.exe_last)
                 .setStartActivityClassArray(
                     arrayOf(
                         MainActivity::class.java,

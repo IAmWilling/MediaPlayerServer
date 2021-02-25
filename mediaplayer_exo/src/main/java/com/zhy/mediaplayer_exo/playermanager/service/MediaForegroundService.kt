@@ -9,6 +9,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
+import com.zhy.mediaplayer_exo.playermanager.MediaPlayerService
+import com.zhy.mediaplayer_exo.playermanager.manager.MediaManager
 import com.zhy.mediaplayer_exo.playermanager.musicbroadcast.MusicBroadcast
 
 
@@ -18,7 +21,8 @@ class MediaForegroundService : Service() {
         val EXTRA_NOTIFICATION_DATA = "EXTRA_NOTIFICATION_DATA"
         @JvmStatic
         val musicBroadcast = MusicBroadcast()
-
+        @JvmStatic
+        var startService = 0
         /**
          * 判断某个服务是否正在运行的方法
          *
@@ -35,7 +39,7 @@ class MediaForegroundService : Service() {
             val myAM = mContext
                 .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             val myList: List<ActivityManager.RunningServiceInfo> = myAM.getRunningServices(40)
-            if (myList.size <= 0) {
+            if (myList.isEmpty()) {
                 return false
             }
             for (i in myList.indices) {
@@ -52,8 +56,11 @@ class MediaForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.apply {
+
             getParcelableExtra<Notification>(EXTRA_NOTIFICATION_DATA)?.apply {
-                startForeground(10086, this)
+                println("MediaForegroundService onStartCommand")
+                startService++
+                startForeground(MediaPlayerService.notificationId, this)
                 registerReceiver(musicBroadcast, IntentFilter(MusicBroadcast.ACTION_MUSIC_BROADCASET_UPDATE))
             }
         }
@@ -78,10 +85,12 @@ class MediaForegroundService : Service() {
         stopForeground(true)
         stopSelf()
         unregisterReceiver(musicBroadcast)
+        MediaManager.getSimpleExoPlayer().pause()
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
-        android.os.Process.killProcess(android.os.Process.myPid())
+        println("MediaForegroundService onDestroy")
+//        android.os.Process.killProcess(android.os.Process.myPid())
         super.onDestroy()
     }
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     android:layout_width="match_parent" android:layout_height="115dp">
 <!--    android:src="@mipmap/notifiction"-->
     <ImageView
@@ -66,7 +65,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="40dp"
         android:layout_toEndOf="@+id/default_song_cover_img"
         android:layout_below="@id/linearLayout"
         android:orientation="horizontal">
@@ -78,11 +77,11 @@
                 android:layout_gravity="center"
                 android:id="@+id/default_last"
                 android:clickable="true"
-                android:background="@drawable/ripple"
-                android:padding="11dp"
+                android:background="@drawable/mediaplayer_exo_default_ripple"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:src="@mipmap/next_and_last_notification" />
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:src="@mipmap/last_notification_icon" />
         </FrameLayout>
 
         <FrameLayout
@@ -91,11 +90,11 @@
             android:layout_weight="1">
             <ImageView
                 android:clickable="true"
-                android:background="@drawable/ripple"
+                android:background="@drawable/mediaplayer_exo_default_ripple"
                 android:layout_gravity="center"
                 android:id="@+id/default_play"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:padding="6dp"
                 android:src="@mipmap/play_notification" />
         </FrameLayout>
@@ -106,12 +105,12 @@
             <ImageView
                 android:layout_gravity="center"
                 android:id="@+id/default_next"
-                android:background="@drawable/ripple"
+                android:background="@drawable/mediaplayer_exo_default_ripple"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:padding="11dp"
+                android:layout_height="match_parent"
+                android:padding="8dp"
                 android:clickable="true"
-                android:src="@mipmap/next_and_last_notification" />
+                android:src="@mipmap/next_notification_icon" />
         </FrameLayout>
 
 
