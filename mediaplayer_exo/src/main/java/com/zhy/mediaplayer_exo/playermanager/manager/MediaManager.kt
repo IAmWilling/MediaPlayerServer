@@ -115,6 +115,12 @@ object MediaManager : Player.EventListener {
         }
     }
 
+    @JvmOverloads
+    fun seekToPositionIndex(index: Int, position: Long) {
+        simpleExoPlayer.seekTo(index, position)
+    }
+
+
     /**
      * 音频进度监听
      *

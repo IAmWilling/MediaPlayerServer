@@ -2,8 +2,10 @@
     package="com.zhy.mediaplayer_exo">
 
     <application>
-        <service android:name="com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService">
-            <intent-filter>
+        <service android:name="com.zhy.mediaplayer_exo.playermanager.service.MediaForegroundService"
+
+            >
+            <intent-filter android:priority="1000">
                 <action android:name="${applicationId}.mediaplayer.service.action" />
             </intent-filter>
         </service>

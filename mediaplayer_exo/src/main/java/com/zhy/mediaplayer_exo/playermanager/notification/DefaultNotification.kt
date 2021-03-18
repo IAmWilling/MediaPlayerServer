@@ -435,6 +435,7 @@ open class DefaultNotification {
             defaultNotification.lastImage = resid
             return this
         }
+
         /**
          * 设置下一曲图片
          */
