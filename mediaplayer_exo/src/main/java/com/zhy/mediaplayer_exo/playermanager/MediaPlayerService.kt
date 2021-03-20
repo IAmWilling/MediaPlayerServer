@@ -24,6 +24,7 @@ object MediaPlayerService : Application.ActivityLifecycleCallbacks {
         this.mNotification = notification
         this.mContext = context
         this.notificationId = id
+        MediaManager.init(context)
         context.registerActivityLifecycleCallbacks(this)
     }
 
@@ -53,7 +54,7 @@ object MediaPlayerService : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         activityCreated++
         if (activityCreated == 1) {
-            MediaManager.init(activity)
+
             val serviceIntent = Intent(mContext, MediaForegroundService::class.java).apply {
                 action = "${mContext.packageName}.mediaplayer.service.action"
                 putExtra(MediaForegroundService.EXTRA_NOTIFICATION_DATA, mNotification)

@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity(), MediaProgressListener, MediaPlayStateL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var a = android.os.Process.myPid()
-        println("yumi proress = ${android.os.Process.myPid()}")
         setContentView(R.layout.activity_main)
         MediaManager.addProgressListener(this)
         MediaManager.addMediaPlayerStateListener(this)

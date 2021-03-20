@@ -12,5 +12,4 @@ interface PlaylistItem {
     val mediaUrl: String?
     val isdownload: Boolean
     val downloadFileUri: String?
-
 }

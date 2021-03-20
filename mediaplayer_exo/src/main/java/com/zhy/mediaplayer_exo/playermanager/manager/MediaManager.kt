@@ -363,6 +363,7 @@ object MediaManager : Player.EventListener {
         }
     }
 
+
     override fun onPlaybackStateChanged(state: Int) {
         when (state) {
             Player.STATE_READY -> {
@@ -380,9 +381,6 @@ object MediaManager : Player.EventListener {
                     MusicBroadcast.PENDINGINTENT_NO_READY_PLAY_CLICK
                 )
             })
-        }
-        infMediaPlayerStateListenerList.map {
-            it.onMediaPlayState(state)
         }
     }
 

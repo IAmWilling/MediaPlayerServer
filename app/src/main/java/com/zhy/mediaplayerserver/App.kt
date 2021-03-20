@@ -34,6 +34,7 @@ class App : Application() {
                 .setMediaCover(BitmapFactory.decodeResource(resources, R.mipmap.icon))
                 .build()
         )
+
     }
 
 }
