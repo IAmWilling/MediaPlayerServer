@@ -1,3 +1,8 @@
+### 效果图：
+![](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/551f8a614bb94c7cade1b3550785b404~tplv-k3u1fbpfcp-watermark.image)
+
+---
+
 # 使用文档
 ## 1.仓库引入
 ```java
@@ -137,12 +142,12 @@ MediaManager.getSimpleExoPlayer()
     /**
      * 获取播放实例
      */
-    fun getSimpleExoPlayer(): SimpleExoPlayer = simpleExoPlayer
+    fun getSimpleExoPlayer(): SimpleExoPlayer 
 
     /**
      * 获取播放总进度
      */
-    fun getCurrentDuration() = simpleExoPlayer.duration
+    fun getCurrentDuration()
 
     /**
      * 获取当前音频标题
