@@ -9,7 +9,7 @@ interface PlaylistItem {
     val title: String?
     val intro: String?
     val coverUrl: String?
-    val mediaUrl: String?
+    var mediaUrl: String?
     val isdownload: Boolean
     val downloadFileUri: String?
 }
