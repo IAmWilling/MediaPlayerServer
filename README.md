@@ -15,7 +15,7 @@ allprojects {
 }
 
 //app/build
-implementation 'com.github.IAmWilling:MediaPlayerServer:1.0.1'
+implementation 'com.github.IAmWilling:MediaPlayerServer:1.0.3'
 ```
 ## 2.初始化播放服务
 ```kotlin
@@ -170,6 +170,27 @@ MediaManager.getSimpleExoPlayer()
      * @link {#MediaPlayerExoPlayMode}
      */
     fun getCurrentPlayMode(): Int
+    
+    
+     /**
+     * 加入媒体列表放置播放器内
+     */
+    fun addMediaItem(item: PlaylistItem, playIndex: Int)
+
+    /**
+     * 加入媒体列表
+     */
+    fun addMediaItem(item: PlaylistItem)
+    /**
+     *
+     * 改变媒体url
+     */
+    fun changeMediaItemAtUrl(playIndex: Int, url: String)
+
+    /**
+     * 获取当前媒体列表
+     */
+    fun getMediaList(): MutableList<PlaylistItem>
 ```
 > **Notification.Builder** API
 
