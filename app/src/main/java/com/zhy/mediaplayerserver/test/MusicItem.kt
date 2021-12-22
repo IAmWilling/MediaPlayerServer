@@ -18,7 +18,7 @@ class MusicItem(val item: PlayItem) : PlaylistItem {
         get() = item.cover
 
     override
-    val mediaUrl: String?
+    var mediaUrl: String? = null
         get() = item.url
 
     override
