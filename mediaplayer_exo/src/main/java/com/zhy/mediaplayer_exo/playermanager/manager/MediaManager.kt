@@ -97,6 +97,49 @@ object MediaManager : Player.EventListener {
         simpleExoPlayer.seekToDefaultPosition(playIndex)
         simpleExoPlayer.play()
     }
+    
+    /**
+     * 加入媒体列表放置播放器内
+     */
+    fun addMediaItem(item: PlaylistItem, playIndex: Int) {
+        simpleExoPlayer.addMediaItem(
+            playIndex, MediaItem.Builder()
+                .setUri(Uri.parse(item.mediaUrl))
+                .setMediaId(item.id.toString())
+                .build()
+        )
+        playlistItemList.add(playIndex, item)
+    }
+
+    /**
+     * 加入媒体列表
+     */
+    fun addMediaItem(item: PlaylistItem) {
+        simpleExoPlayer.addMediaItem(
+            MediaItem.Builder()
+                .setUri(Uri.parse(item.mediaUrl))
+                .setMediaId(item.id.toString())
+                .build()
+        )
+        playlistItemList.add(item)
+    }
+    /**
+     *
+     * 改变媒体url
+     */
+    fun changeMediaItemAtUrl(playIndex: Int, url: String) {
+        playlistItemList[playIndex].mediaUrl = url
+        var build =
+            simpleExoPlayer.getMediaItemAt(playIndex).buildUpon().setUri(Uri.parse(url)).build()
+        simpleExoPlayer.removeMediaItem(playIndex)
+        simpleExoPlayer.addMediaItem(playIndex, build)
+    }
+
+    /**
+     * 获取当前媒体列表
+     */
+    fun getMediaList(): MutableList<PlaylistItem> = playlistItemList
+    
 
     /**
      * {@see #MediaPlayerExoPlayMode}
